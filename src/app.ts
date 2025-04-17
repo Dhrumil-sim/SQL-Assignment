@@ -5,11 +5,10 @@ import { errorHandler } from './middlewares/errorHandler/errorHandler.js';
 import morgan from 'morgan';
 class App {
   public app: Application;
-
+  a = 10;
   constructor() {
     this.app = express();
     this.setMiddlewares();
-    this.setRoutes();
 
     this.setErrorHandler();
   }
