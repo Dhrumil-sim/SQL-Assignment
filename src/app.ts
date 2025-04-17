@@ -23,8 +23,6 @@ class App {
     this.app.use(morgan(':method :url :status :response-time ms'));
   }
 
-  private setRoutes(): void {}
-
   private setErrorHandler(): void {
     this.app.use(errorHandler);
   }
