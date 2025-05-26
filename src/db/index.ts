@@ -2,6 +2,7 @@ import { Sequelize } from 'sequelize';
 import dbConfig from './db.config';
 import { initUserModel } from '../models/user.model';
 import { initProductModel } from '../models/product.model';
+import { initOrderModel } from '../models/order.model';
 
 const sequelize = new Sequelize(dbConfig.DB, dbConfig.USER, dbConfig.PASSWORD, {
   host: dbConfig.HOST,
@@ -13,6 +14,7 @@ const sequelize = new Sequelize(dbConfig.DB, dbConfig.USER, dbConfig.PASSWORD, {
 // Initialize all models here
 const User = initUserModel(sequelize);
 const Product = initProductModel(sequelize);
+const Order = initOrderModel(sequelize);
 // Sync the database
 const connectDB = async (): Promise<void> => {
   try {
@@ -25,5 +27,5 @@ const connectDB = async (): Promise<void> => {
   }
 };
 
-export { sequelize, User, Product };
+export { sequelize, User, Product, Order };
 export default connectDB;
