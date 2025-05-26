@@ -1,10 +1,10 @@
 import dotenv from 'dotenv';
-import connectDB from './db/index';
+import connectDB from './db/index'; // now it's a proper TS module
 import app from './app';
+
 dotenv.config();
 
 const PORT = process.env['PORT'] || 3000;
-console.log('hello');
 
 connectDB()
   .then(() => {
@@ -13,5 +13,5 @@ connectDB()
     });
   })
   .catch((err) => {
-    console.error('❌ MongoDB connection failed!', err);
+    console.error('❌ PostgreSQL connection failed!', err); // ✅ updated
   });

@@ -1,40 +1,28 @@
-/**
- * @module DatabaseConnection
- * @description Handles MongoDB connection using Mongoose.
- */
+import { Sequelize } from 'sequelize';
+import dbConfig from './db.config';
+import { initUserModel } from '../models/user.model';
 
-import mongoose, { Connection } from 'mongoose';
+const sequelize = new Sequelize(dbConfig.DB, dbConfig.USER, dbConfig.PASSWORD, {
+  host: dbConfig.HOST,
+  port: dbConfig.PORT,
+  dialect: 'postgres',
+  logging: true, // or true to log SQL
+});
 
-import dotenv from 'dotenv';
-dotenv.config();
+// Initialize all models here
+const User = initUserModel(sequelize);
 
-/**
- * Connects to the MongoDB database.
- *
- * @async
- * @function connectDB
- * @returns {Promise<Connection | void>} Resolves with the Mongoose connection instance or exits on failure.
- * @throws Will log an error and terminate the process if the connection fails.
- */
-const connectDB = async (): Promise<Connection | void> => {
+// Sync the database
+const connectDB = async (): Promise<void> => {
   try {
-    if (!process.env['MONGO_URI']) {
-      throw new Error('MONGO_URI is not defined in environment variables');
-    }
-
-    const connectionInstance = await mongoose.connect(
-      `${process.env['MONGO_URI']}`,
-    );
-
-    console.log(
-      `✅ MongoDB connected! Host: ${connectionInstance.connection.host}`,
-    );
-
-    return connectionInstance.connection;
+    await sequelize.authenticate();
+    await sequelize.sync(); // Creates tables if not exist
+    console.log('✅ PostgreSQL connected and tables created');
   } catch (error) {
-    console.error('❌ Error connecting to MongoDB:', error);
-    process.exit(1); // Exit the process with failure code
+    console.error('❌ DB connection error:', error);
+    throw error;
   }
 };
 
+export { sequelize, User };
 export default connectDB;
