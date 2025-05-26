@@ -1,13 +1,14 @@
 import express, { Application } from 'express';
 import cors from 'cors';
 import { errorHandler } from './middlewares/errorHandler/errorHandler.js';
+import userRouter from './routes/user.route.js';
 import morgan from 'morgan';
 class App {
   public app: Application;
   constructor() {
     this.app = express();
     this.setMiddlewares();
-
+    this.setRoutes();
     this.setErrorHandler();
   }
 
@@ -25,7 +26,9 @@ class App {
   private setErrorHandler(): void {
     this.app.use(errorHandler);
   }
-
+  private setRoutes(): void {
+    this.app.use('/api/user', userRouter); // Example route path
+  }
   public getServer(): Application {
     return this.app;
   }

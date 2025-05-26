@@ -1,7 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
 import Joi from 'joi';
-import { ApiError } from '@utils';
+
 import { StatusCodes } from 'http-status-codes';
+import { ApiError } from '../../utils';
 
 export const validateRequest = (schema: Joi.ObjectSchema) => {
   return (req: Request, res: Response, next: NextFunction) => {
@@ -18,8 +19,8 @@ export const validateRequest = (schema: Joi.ObjectSchema) => {
           StatusCodes.BAD_REQUEST,
           'VALIDATION_ERROR',
           'Invalid Inputs',
-          errors
-        )
+          errors,
+        ),
       );
     }
 
