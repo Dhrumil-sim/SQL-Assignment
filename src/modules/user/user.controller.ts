@@ -46,21 +46,19 @@ export class UserController {
   // UPDATE a user
   static updateUser = asyncHandler(async (req: Request, res: Response) => {
     const { id } = req.params;
+
     const { userName, password } = req.body;
 
-    const user = await User.findByPk(id);
+    console.log('Searching for user with ID:', id);
+    const user = await User.findByPk(Number(id));
+
     if (!user) {
       return res
         .status(StatusCodes.NOT_FOUND)
         .json({ message: 'User not found' });
     }
 
-    user.update({
-      userName: userName,
-      password: password,
-    });
-
-    await user.save();
+    user.update({ userName, password });
 
     return res.status(StatusCodes.OK).json({
       message: 'User updated successfully',

@@ -8,7 +8,14 @@ const sequelize = new Sequelize(dbConfig.DB, dbConfig.USER, dbConfig.PASSWORD, {
   host: dbConfig.HOST,
   port: dbConfig.PORT,
   dialect: 'postgres',
-  logging: true, // or true to log SQL
+  logging: (sql, timing) => {
+    if (timing !== undefined) {
+      console.log(`[SQL] ${sql} - Execution time: ${timing}ms`);
+    } else {
+      console.log(`[SQL] ${sql}`);
+    }
+  },
+  benchmark: true,
 });
 
 // Initialize all models here
