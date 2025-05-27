@@ -33,7 +33,13 @@ export class UserController {
   static getUserById = asyncHandler(async (req: Request, res: Response) => {
     const { id } = req.params;
     const user = await User.findByPk(id);
-
+    const userById = await User.findAll({
+      where: {
+        id: [4],
+      },
+      raw: true,
+    });
+    console.log(userById);
     if (!user) {
       return res
         .status(StatusCodes.NOT_FOUND)
@@ -49,7 +55,6 @@ export class UserController {
 
     const { userName, password } = req.body;
 
-    console.log('Searching for user with ID:', id);
     const user = await User.findByPk(Number(id));
 
     if (!user) {
@@ -58,6 +63,7 @@ export class UserController {
         .json({ message: 'User not found' });
     }
 
+    user.changed('userName', true);
     user.update({ userName, password });
 
     return res.status(StatusCodes.OK).json({

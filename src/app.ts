@@ -2,6 +2,9 @@ import express, { Application } from 'express';
 import cors from 'cors';
 import { errorHandler } from './middlewares/errorHandler/errorHandler.js';
 import userRouter from './routes/user.route.js';
+import orderRouter from './routes/order.routes.js';
+import orderDetailsRouter from './routes/orderDetails.routes.js';
+import productRouter from './routes/product.routes.js';
 import morgan from 'morgan';
 class App {
   public app: Application;
@@ -28,6 +31,9 @@ class App {
   }
   private setRoutes(): void {
     this.app.use('/api/user', userRouter); // Example route path
+    this.app.use('/api/order', orderRouter);
+    this.app.use('/api/product', productRouter);
+    this.app.use('/api/order-details', orderDetailsRouter);
   }
   public getServer(): Application {
     return this.app;
