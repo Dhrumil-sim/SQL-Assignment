@@ -54,7 +54,7 @@ export class UserController {
     const { id } = req.params;
     const { userName, password } = req.body;
 
-    const user = await User.findByPk(Number(id));
+    const user = await User.findByPk(Number(id)); // <-- remove raw: true
 
     if (!user) {
       return res
@@ -63,14 +63,14 @@ export class UserController {
     }
 
     if (userName) {
-      user.userName = userName;
+      user.update({
+        userName: userName,
+      }); // has no effect if password setter is missing
     }
 
     if (password) {
-      user.set('password', password); // <-- triggers hash
+      user.update({ password: password }); // <-- works if User model has a setter that hashes
     }
-
-    await user.save();
 
     return res.status(StatusCodes.OK).json({
       message: 'User updated successfully',

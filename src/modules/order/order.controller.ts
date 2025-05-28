@@ -99,7 +99,7 @@ export class OrderController {
       }
 
       // Check Product Exists
-      const product = await Product.findByPk(productID, { raw: true });
+      const product = await Product.findByPk(productID);
       if (!product) {
         return res
           .status(StatusCodes.BAD_REQUEST)
@@ -136,7 +136,8 @@ export class OrderController {
       const transaction = await OrderDetail.sequelize!.transaction();
 
       try {
-        const total = product.price * quantity;
+        const total = Number(product.dataValues.price) * quantity;
+        console.log(product.dataValues.price);
         console.log('Total :', total);
         const detail = await OrderDetail.create(
           {
@@ -148,9 +149,10 @@ export class OrderController {
           { transaction },
         );
 
+        console.log('Stock', product.stock);
         // Deduct stock from product
         await product.update(
-          { stock: product.stock - quantity },
+          { stock: Number(product.dataValues.stock) - quantity },
           { transaction },
         );
 

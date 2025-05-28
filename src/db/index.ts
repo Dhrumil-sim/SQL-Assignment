@@ -24,12 +24,19 @@ const User = initUserModel(sequelize);
 const Product = initProductModel(sequelize);
 const Order = initOrderModel(sequelize);
 const OrderDetails = initOrderDetailModel(sequelize);
+User.hasMany(Order, { foreignKey: 'userID' });
+Order.belongsTo(User, { foreignKey: 'userID' });
+
+Order.hasMany(OrderDetails, { foreignKey: 'orderID' });
+OrderDetails.belongsTo(Order, { foreignKey: 'orderID' });
+
+OrderDetails.belongsTo(Product, { foreignKey: 'productID' });
+Product.hasMany(OrderDetails, { foreignKey: 'productID' });
 // Sync the database
 const connectDB = async (): Promise<void> => {
   try {
     await sequelize.authenticate();
     await sequelize.sync(); // Creates tables if not exist
-    console.log('✅ PostgreSQL connected and tables created');
   } catch (error) {
     console.error('❌ DB connection error:', error);
     throw error;
