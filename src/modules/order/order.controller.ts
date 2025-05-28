@@ -148,6 +148,12 @@ export class OrderController {
           { transaction },
         );
 
+        // Deduct stock from product
+        await product.update(
+          { stock: product.stock - quantity },
+          { transaction },
+        );
+
         await transaction.commit();
         return res.status(StatusCodes.CREATED).json({
           message: 'Order detail created successfully',

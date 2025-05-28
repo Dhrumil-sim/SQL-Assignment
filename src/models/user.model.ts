@@ -1,3 +1,4 @@
+import bcrypt from 'bcrypt';
 import { DataTypes, Model, Sequelize } from 'sequelize';
 
 export class User extends Model {
@@ -24,6 +25,10 @@ export const initUserModel = (sequelize: Sequelize): typeof User => {
       password: {
         type: DataTypes.STRING,
         allowNull: false,
+        set(value: string) {
+          const hashedPassword = bcrypt.hashSync(value, 10); // 10 is the salt rounds
+          this.setDataValue('password', hashedPassword);
+        },
       },
     },
     {

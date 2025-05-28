@@ -52,7 +52,6 @@ export class UserController {
   // UPDATE a user
   static updateUser = asyncHandler(async (req: Request, res: Response) => {
     const { id } = req.params;
-
     const { userName, password } = req.body;
 
     const user = await User.findByPk(Number(id));
@@ -63,8 +62,15 @@ export class UserController {
         .json({ message: 'User not found' });
     }
 
-    user.changed('userName', true);
-    user.update({ userName, password });
+    if (userName) {
+      user.userName = userName;
+    }
+
+    if (password) {
+      user.set('password', password); // <-- triggers hash
+    }
+
+    await user.save();
 
     return res.status(StatusCodes.OK).json({
       message: 'User updated successfully',
