@@ -6,6 +6,8 @@ import orderRouter from './routes/order.routes.js';
 import orderDetailsRouter from './routes/orderDetails.routes.js';
 import productRouter from './routes/product.routes.js';
 import morgan from 'morgan';
+import swaggerUi from 'swagger-ui-express';
+import { swaggerSpec } from './utils/swagger'; // adjust path
 class App {
   public app: Application;
   constructor() {
@@ -17,6 +19,7 @@ class App {
 
   private setMiddlewares(): void {
     this.app.use(express.json({ limit: '5mb' }));
+    this.app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
     this.app.use(express.urlencoded({ extended: true, limit: '5mb' }));
     this.app.use(cors({ origin: process.env['CORS_ORIGIN'] }));
 
@@ -30,8 +33,8 @@ class App {
     this.app.use(errorHandler);
   }
   private setRoutes(): void {
-    this.app.use('/api/user', userRouter); // Example route path
-    this.app.use('/api/order', orderRouter);
+    this.app.use('/api/users', userRouter); // Example route path
+    this.app.use('/api/orders', orderRouter);
     this.app.use('/api/product', productRouter);
     this.app.use('/api/order-details', orderDetailsRouter);
   }
