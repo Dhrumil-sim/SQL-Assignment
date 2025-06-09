@@ -1,24 +1,25 @@
 import { Request, Response, NextFunction } from 'express';
-import { ApiError } from '@utils';
+
 import chalk from 'chalk';
+import { ApiError } from '../../utils';
 const errorHandler = (
   err: ApiError,
   req: Request,
   res: Response,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  next: NextFunction
+  next: NextFunction,
 ) => {
   console.error(
-    chalk.red(`[${new Date().toISOString()}] ${err.errorCode}: ${err.message}`)
+    chalk.red(`[${new Date().toISOString()}] ${err.errorCode}: ${err.message}`),
   );
-  if (err.errors.length > 0) {
+  if (Array.isArray(err.errors) && err.errors.length > 0) {
     console.error(
       chalk.yellow('Details:'),
-      chalk.cyan(JSON.stringify(err.errors, null, 2))
+      chalk.cyan(JSON.stringify(err.errors, null, 2)),
     );
     console.error(
       chalk.yellow('Data:'),
-      chalk.cyan(JSON.stringify(err.data, null, 2))
+      chalk.cyan(JSON.stringify(err.data, null, 2)),
     );
   }
 

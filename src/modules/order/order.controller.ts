@@ -4,7 +4,8 @@ import { Order } from '../../models/order.model';
 import { StatusCodes } from 'http-status-codes';
 import { OrderDetail } from '../../models/order.details.model';
 import { ICreateOrderDetailDTO, IUpdateOrderDetailDTO } from './order.dto';
-import { Product } from '../../db';
+import { Product, sequelize, User } from '../../db';
+import { Op } from 'sequelize';
 
 export class OrderController {
   // CREATE Order
@@ -26,7 +27,16 @@ export class OrderController {
 
   // GET All Orders
   static getAllOrders = asyncHandler(async (_req: Request, res: Response) => {
-    const orders = await Order.findAll();
+    const orders = await Order.findAll({
+      include: [
+        { model: User, attributes: ['name'] },
+        {
+          model: OrderDetail,
+          include: [{ model: Product, attributes: ['name'] }],
+        },
+      ],
+    });
+
     return res.status(StatusCodes.OK).json(orders);
   });
 
@@ -232,4 +242,91 @@ export class OrderController {
       return res.status(StatusCodes.NO_CONTENT).send();
     },
   );
+
+  static summaryReport = asyncHandler(async (_req: Request, res: Response) => {
+    const undeliveredOrders = await Order.findAll({
+      where: { expectedDeliveryDate: null },
+      include: [User],
+      raw: true,
+    });
+
+    const recentOrders = await Order.findAll({
+      include: [{ model: User, attributes: ['userName'] }],
+      order: [['orderDate', 'DESC']],
+      limit: 5,
+    });
+
+    const topUsers = this.topUsers;
+
+    const inactiveUsers = this.inactiveUsers;
+
+    const topProducts = this.topProducts;
+
+    const orderTotals = await OrderDetail.findAll({
+      attributes: [
+        'orderID',
+        [sequelize.fn('SUM', sequelize.col('total')), 'total'],
+      ],
+      group: ['orderID'],
+      order: [[sequelize.literal('total'), 'DESC']],
+      raw: true,
+    });
+
+    const mostExpensive = orderTotals[0];
+    const cheapest = orderTotals[orderTotals.length - 1];
+
+    return res.status(StatusCodes.OK).json({
+      undeliveredOrders,
+      recentOrders,
+      topUsers,
+      inactiveUsers,
+      topProducts,
+      mostExpensive,
+      cheapest,
+    });
+  });
+
+  static topUsers = asyncHandler(async () => {
+    const topUsers = await Order.findAll({
+      attributes: [
+        'userID',
+        [sequelize.fn('COUNT', sequelize.col('"UserID"')), 'orderCount'],
+      ],
+      include: [{ model: User, attributes: ['userName'] }],
+      group: ['userID', 'User.id'],
+      order: [[sequelize.literal('2'), 'DESC']],
+      limit: 5,
+      raw: true,
+    });
+    return topUsers;
+  });
+
+  static inactiveUsers = asyncHandler(async () => {
+    const inactiveUsers = await User.findAll({
+      where: {
+        id: {
+          [Op.notIn]: sequelize.literal(
+            `(SELECT DISTINCT "UserID" FROM "orders")`,
+          ),
+        },
+      },
+      attributes: ['id', 'userName'],
+    });
+    return inactiveUsers;
+  });
+
+  static topProducts = asyncHandler(async () => {
+    const topProducts = await OrderDetail.findAll({
+      attributes: [
+        'productID',
+        [sequelize.fn('SUM', sequelize.col('quantity')), 'totalSold'],
+      ],
+      include: [{ model: Product, attributes: ['name'] }],
+      group: ['productID', 'Product.id'],
+      order: [[sequelize.literal('2'), 'DESC']],
+      limit: 5,
+      raw: true,
+    });
+    return topProducts;
+  });
 }

@@ -22,7 +22,7 @@ router.post(
 
 router.get('/', OrderController.getAllOrderDetails);
 
-router.get('/:id', OrderController.getOrderById);
+router.get('/byID/:id', OrderController.getOrderById);
 
 router.put(
   '/:id',
@@ -32,4 +32,6 @@ router.put(
 
 router.delete('/:id', OrderController.deleteOrderDetail);
 
+router.get('/summary-report', OrderController.summaryReport);
+router.get('/top-users', OrderController.topUsers);
 export default router;
