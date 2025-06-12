@@ -29,7 +29,7 @@ export class OrderController {
   static getAllOrders = asyncHandler(async (_req: Request, res: Response) => {
     const orders = await Order.findAll({
       include: [
-        { model: User, attributes: ['name'] },
+        { model: User, attributes: ['userName'] },
         {
           model: OrderDetail,
           include: [{ model: Product, attributes: ['name'] }],
@@ -44,7 +44,7 @@ export class OrderController {
   static getOrderById = asyncHandler(async (req: Request, res: Response) => {
     const { id } = req.params;
     const order = await Order.findByPk(Number(id));
-
+    console.log(order);
     if (!order) {
       return res
         .status(StatusCodes.NOT_FOUND)
